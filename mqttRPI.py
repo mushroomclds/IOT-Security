@@ -8,9 +8,9 @@ mixer.init() #initialize mixer obj
 sound = mixer.Sound('jazz.wav')#load jazz song
 
 
-MQTT_ADDRESS = 'xxxx'
-MQTT_USER = 'xxxx'
-MQTT_PASSWORD = 'xxxx'
+MQTT_ADDRESS = '192.168.0.180'
+MQTT_USER = 'mushroom'
+MQTT_PASSWORD = '1234'
 MQTT_TOPIC = 'esp/ultrasonic'
 
 
