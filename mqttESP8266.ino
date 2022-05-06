@@ -10,16 +10,18 @@ float buff[BUFF_LENGTH];
 int next = -1;
 
 const int ledPin = 0; 
+const int red = 4; //13
+const int green = 5; //14
 
 // WiFi
-const char* ssid = "xxxx";
-const char* wifi_password = "xxxx";
+const char* ssid = "xxx";
+const char* wifi_password = "xxx";
 
 // MQTT
-const char* mqtt_server = "xxxx"; //MQTT Broker IP Address, RPI IP
-const char* mqtt_topic = "esp/ultrasonic"; //topic
-const char* mqtt_username = "xxxx";
-const char* mqtt_password = "xxxx";
+const char* mqtt_server = "xxx"; //MQTT Broker IP Address, RPI IP
+const char* topic = "esp/ultrasonic"; //topic
+const char* mqtt_username = "mushroom";
+const char* mqtt_password = "1234";
 const char* clientID = "ESP8266 Micro"; //name of our client
 
 //Creating wifi variables
@@ -32,15 +34,19 @@ void callback(char* topic, byte* payload, unsigned int length) {
  for (int i=0;i<length;i++) { //goes through entire message received and checks for 0 or 1
   char receivedChar = (char)payload[i];
   Serial.print(receivedChar);
-  if (receivedChar == '0')
-  digitalWrite(ledPin, HIGH);
-  if (receivedChar == '1')
-   digitalWrite(ledPin, LOW); //contrlling LED through mqtt
+  if (receivedChar == '0'){
+  digitalWrite(green, HIGH);
+  digitalWrite(red, LOW);
+  }
+  if (receivedChar == '1'){
+   digitalWrite(red, HIGH); //contrlling LED through mqtt
+   digitalWrite(green, LOW);
+  }
   }
   Serial.println();
 }
 bool Connect() {//function to subscribe to topic of ledstatus
-  if (client.connect(clientID, mqtt_username, mqtt_password)) {
+  if (client.connect(clientID)) { //(clientID, mqtt_username, mqtt_password)
       Serial.println("Connected to MQTT Broker!");
       client.subscribe("ledStatus");
       return true;
@@ -52,6 +58,8 @@ bool Connect() {//function to subscribe to topic of ledstatus
 }
 void setup() {
   pinMode(ledPin, OUTPUT); //onboard led
+  pinMode(green, OUTPUT); //onboard led
+  pinMode(red, OUTPUT); //onboard led
   pinMode(TRIG_PIN, OUTPUT); //ultrasonic trig pin
   pinMode(ECHO_PIN, INPUT); //ultrasonic echo pin
   client.setCallback(callback);
@@ -76,7 +84,7 @@ void loop() {
   
   //loop is for receiving messages
   client.loop(); //allows client to be connected to broker, returns false if disconnect
-
+  delay(500);
   //ultrasonic function calls
   float distance = readDistance(); //read distance function call
   next = (next >= BUFF_LENGTH || next < 0) ? 0 : (next + 1);
